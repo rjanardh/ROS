@@ -15,16 +15,16 @@ DONE = 2
 WARN = 3
 ERROR = 4
 
-nImage = 1
+Image_Count = 1
 
 # definition of the feedback callback. This will be called when feedback
 # is received from the action server
 # it just prints a message indicating a new message has been received
 def feedback_callback(feedback):
 
-    global nImage
-    print('[Feedback] image n.%d received'%nImage)
-    nImage += 1
+    global Image_Count
+    print('[Feedback] image n.%d received'%Image_Count)
+    Image_Count += 1
 
 # initializes the action client node
 rospy.init_node('drone_action_client')
@@ -39,9 +39,9 @@ land = rospy.Publisher('/drone/land', Empty, queue_size=1) #Create a Publisher t
 land_msg = Empty() #Create the message to land the drone
 
 # waits until the action server is up and running
-rospy.loginfo('Waiting for action Server '+action_server_name)
+rospy.loginfo('Server wait time '+action_server_name)
 client.wait_for_server()
-rospy.loginfo('Action Server Found...'+action_server_name)
+rospy.loginfo('Found Server'+action_server_name)
 
 # creates a goal to send to the action server
 goal = ArdroneGoal()
@@ -64,7 +64,7 @@ rospy.loginfo("state_result: "+str(state_result))
 i=0
 while not i == 3:
     takeoff.publish(takeoff_msg)
-    rospy.loginfo('Taking off...')
+    rospy.loginfo('Flying up')
     time.sleep(1)
     i += 1
 
@@ -75,14 +75,14 @@ while state_result < DONE:
     move.publish(move_msg)
     rate.sleep()
     state_result = client.get_state()
-    rospy.loginfo('Moving around...')
+    rospy.loginfo('Executing movements')
     rospy.loginfo("state_result: "+str(state_result))
     
 rospy.loginfo("[Result] State: "+str(state_result))
 if state_result == ERROR:
-    rospy.logerr("Something went wrong in the Server Side")
+    rospy.logerr("Server error")
 if state_result == WARN:
-    rospy.logwarn("There is a warning in the Server Side")
+    rospy.logwarn("Server error")
 
 # We land the drone when the action is finished
 i=0
@@ -91,7 +91,6 @@ while not i == 3:
     move_msg.angular.z = 0
     move.publish(move_msg)
     land.publish(land_msg)
-    rospy.loginfo('Landing...')
+    rospy.loginfo('Finishing flight')
     time.sleep(1)
     i += 1
-
