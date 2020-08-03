@@ -1,4 +1,4 @@
-#Code to get a drone moving around using ROS actions
+#Code to get a drone moving around using ROS actions as part of projects done via RoboIgniteAcademy
 #! /usr/bin/env python
 
 import rospy
